@@ -283,44 +283,44 @@ class FilterHandler:
         except Exception as ex:
             raise _exceptions.AddFilterError(ex)
 
-    def delete_filter(self, filter_id: str):
+    def delete_filter(self, id: str):
         """
         Delete a filter.
-        :param filter_id: ID of a filter to be deleted.
+        :param id: ID of a filter to be deleted.
         :return: None
         """
         try:
-            validate(filter_id, str, "filter_id")
+            validate(id, str, "id")
             with self.__lock:
-                if filter_id in self.__filter_metadata:
-                    filter_md = self.__filter_metadata[filter_id]
-                    self.__del_filter_metadata(filter_id=filter_id)
+                if id in self.__filter_metadata:
+                    filter_md = self.__filter_metadata[id]
+                    self.__del_filter_metadata(filter_id=id)
                     if filter_md[model.FilterMetadata.i_hash]:
-                        self.__del_identifier(i_hash=filter_md[model.FilterMetadata.i_hash], filter_id=filter_id)
-                    self.__del_mappings(m_hash=filter_md[model.FilterMetadata.m_hash], filter_id=filter_id)
-                    self.__del_source(source=filter_md[model.FilterMetadata.source], filter_id=filter_id)
+                        self.__del_identifier(i_hash=filter_md[model.FilterMetadata.i_hash], filter_id=id)
+                    self.__del_mappings(m_hash=filter_md[model.FilterMetadata.m_hash], filter_id=id)
+                    self.__del_source(source=filter_md[model.FilterMetadata.source], filter_id=id)
                     self.__del_filter(
                         i_str=filter_md[model.FilterMetadata.i_str],
                         m_hash=filter_md[model.FilterMetadata.m_hash],
-                        filter_id=filter_id
+                        filter_id=id
                     )
                 else:
-                    raise _exceptions.UnknownFilterIDError(filter_id=filter_id)
+                    raise _exceptions.UnknownFilterIDError(filter_id=id)
         except Exception as ex:
             raise _exceptions.DeleteFilterError(ex)
 
-    def get_filter_args(self, filter_id: str) -> typing.Dict:
+    def get_filter_args(self, id: str) -> typing.Dict:
         """
         Get filter arguments.
-        :param filter_id: ID of a filter.
+        :param id: ID of a filter.
         :return: Dictionary containing args of a filter.
         """
-        validate(filter_id, str, "filter_id")
+        validate(id, str, "id")
         with self.__lock:
-            if filter_id in self.__filter_metadata:
-                return self.__filter_metadata[filter_id][model.FilterMetadata.args]
+            if id in self.__filter_metadata:
+                return self.__filter_metadata[id][model.FilterMetadata.args]
             else:
-                raise _exceptions.UnknownFilterIDError(filter_id=filter_id)
+                raise _exceptions.UnknownFilterIDError(filter_id=id)
 
     def get_sources(self) -> typing.List:
         """

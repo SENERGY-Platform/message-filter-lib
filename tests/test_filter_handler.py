@@ -47,7 +47,7 @@ class TestFilterHandler(unittest.TestCase):
         for item in filters:
             try:
                 if item["action"] == "delete":
-                    filter_handler.delete_filter(filter_id=item["id"])
+                    filter_handler.delete_filter(id=item["id"])
                 if item["action"] == "add":
                     filter_handler.add_filter(filter=item["filter"])
                 count += 1
@@ -106,5 +106,5 @@ class TestFilterHandler(unittest.TestCase):
 
     def test_get_filter_args(self):
         filter_handler = self._test_filter_ingestion(filters=filters_good)
-        export_args = filter_handler.get_filter_args(filter_id="filter-1")
+        export_args = filter_handler.get_filter_args(id="filter-1")
         self.assertEqual(export_args["arg"], "test")
