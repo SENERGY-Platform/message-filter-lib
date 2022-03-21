@@ -115,7 +115,6 @@ class FilterHandler:
         self.__mappings_filter_map = dict()
         self.__identifiers_filter_map = dict()
         self.__sources_filter_map = dict()
-        self.__sources_timestamp = None
 
     def __add_filter(self, i_str, m_hash, filter_id):
         try:
@@ -202,7 +201,6 @@ class FilterHandler:
                 self.__sources_filter_map[source] = {filter_id}
             else:
                 self.__sources_filter_map[source].add(filter_id)
-            self.__sources_timestamp = time.time_ns()
         except Exception as ex:
             raise AddSourceError(ex)
 
@@ -212,7 +210,6 @@ class FilterHandler:
             if not self.__sources_filter_map[source]:
                 self.__sources.discard(source)
                 del self.__sources_filter_map[source]
-                self.__sources_timestamp = time.time_ns()
         except Exception as ex:
             raise DeleteSourceError(ex)
 
@@ -264,7 +261,6 @@ class FilterHandler:
                 m_hash=m_hash,
                 filter_id=id
             )
-            self.__sources_timestamp = time.time_ns()
 
     def __identify_msg(self, msg: typing.Dict):
         try:
@@ -350,11 +346,3 @@ class FilterHandler:
         """
         with self.__lock:
             return list(self.__sources)
-
-    def get_sources_timestamp(self) -> typing.Optional[int]:
-        """
-        Get timestamp that indicates the last time a filter was added or removed.
-        :return: Timestamp or None.
-        """
-        with self.__lock:
-            return self.__sources_timestamp
