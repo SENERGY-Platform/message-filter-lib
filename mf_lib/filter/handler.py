@@ -37,7 +37,7 @@ def hash_mappings(mappings: typing.Dict):
     try:
         return hash_dict(mappings)
     except Exception as ex:
-        raise HashMappingError(ex, mappings)
+        raise HashMappingsError(ex, mappings)
 
 
 def parse_mappings(mappings: typing.Dict) -> typing.Dict:
@@ -62,7 +62,7 @@ def parse_mappings(mappings: typing.Dict) -> typing.Dict:
             )
         return parsed_mappings
     except Exception as ex:
-        raise ParseMappingError(ex, mappings)
+        raise ParseMappingsError(ex, mappings)
 
 
 def mapper(mappings: typing.List, msg: typing.Dict) -> typing.Generator:
@@ -151,7 +151,7 @@ class FilterHandler:
             else:
                 self.__mappings_export_map[m_hash].add(export_id)
         except Exception as ex:
-            raise AddMappingError(ex)
+            raise AddMappingsError(ex)
 
     def __del_mappings(self, m_hash: str, export_id: str):
         try:
@@ -160,7 +160,7 @@ class FilterHandler:
                 del self.__mappings[m_hash]
                 del self.__mappings_export_map[m_hash]
         except Exception as ex:
-            raise DeleteMappingError(ex)
+            raise DeleteMappingsError(ex)
 
     def __add_msg_identifier(self, identifiers: list, export_id: str):
         try:
@@ -306,7 +306,7 @@ class FilterHandler:
                     except Exception as ex:
                         yield FilterResult(ex=ex)
             else:
-                raise NoFilterError(message)
+                raise NoFilterError()
 
     def add_filter(self, filter: typing.Dict):
         """
