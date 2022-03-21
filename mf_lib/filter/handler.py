@@ -301,7 +301,7 @@ class FilterHandler:
                             filter_ids=tuple(self.__filters[i_str][m_hash])
                         )
                     except Exception as ex:
-                        yield FilterResult(ex=ex)
+                        yield FilterResult(filter_ids=tuple(self.__filters[i_str][m_hash]), ex=ex)
             else:
                 raise NoFilterError()
 
