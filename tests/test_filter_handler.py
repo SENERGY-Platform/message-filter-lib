@@ -42,7 +42,7 @@ with open("tests/resources/get_results_bad_filters.json") as file:
 
 class TestFilterHandler(unittest.TestCase):
     def _test_filter_ingestion(self, filters):
-        filter_handler = mf_lib.filter.FilterHandler()
+        filter_handler = mf_lib.FilterHandler()
         count = 0
         for item in filters:
             try:
@@ -52,7 +52,7 @@ class TestFilterHandler(unittest.TestCase):
                     filter_handler.add_filter(filter=item["filter"])
                 count += 1
             except Exception as ex:
-                self.assertIsInstance(ex, mf_lib.filter.exceptions.FilterHandlerError)
+                self.assertIsInstance(ex, mf_lib.exceptions.FilterHandlerError)
                 count += 1
         self.assertEqual(count, len(filters))
         for source in filter_handler.get_sources():
@@ -68,7 +68,7 @@ class TestFilterHandler(unittest.TestCase):
                     for result in filter_handler.get_results(message=message, source=source):
                         self.assertIn(str(result), get_results_good_filters)
                         count += 1
-                except mf_lib.filter.exceptions.NoFilterError:
+                except mf_lib.exceptions.NoFilterError:
                     pass
         self.assertEqual(count, len(get_results_good_filters) - 1)
 
@@ -87,7 +87,7 @@ class TestFilterHandler(unittest.TestCase):
                         else:
                             self.assertIn(str(result), get_results_bad_filters)
                             r_count += 1
-                except mf_lib.filter.exceptions.NoFilterError:
+                except mf_lib.exceptions.NoFilterError:
                     ex_count -= 1
         self.assertEqual(ex_count, 0)
         self.assertEqual(r_count, len(get_results_bad_filters))
@@ -100,7 +100,7 @@ class TestFilterHandler(unittest.TestCase):
                 try:
                     for _ in filter_handler.get_results(message=message, source=source):
                         count += 1
-                except mf_lib.filter.exceptions.MessageIdentificationError:
+                except mf_lib.exceptions.MessageIdentificationError:
                     pass
         self.assertEqual(count, 0)
 
