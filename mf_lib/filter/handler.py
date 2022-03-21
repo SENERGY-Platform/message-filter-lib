@@ -159,7 +159,7 @@ class FilterHandler:
         except Exception as ex:
             raise DeleteMappingsError(ex)
 
-    def __add_msg_identifier(self, identifiers: list, filter_id: str):
+    def __add_identifier(self, identifiers: list, filter_id: str):
         try:
             i_val_keys = list()
             i_no_val_keys = list()
@@ -186,7 +186,7 @@ class FilterHandler:
         except Exception as ex:
             raise AddMessageIdentifierError(ex)
 
-    def __del_msg_identifier(self, i_hash: str, filter_id: str):
+    def __del_identifier(self, i_hash: str, filter_id: str):
         try:
             self.__identifiers_filter_map[i_hash].discard(filter_id)
             if not self.__identifiers_filter_map[i_hash]:
@@ -216,7 +216,7 @@ class FilterHandler:
         except Exception as ex:
             raise DeleteSourceError(ex)
 
-    def __add_filter_meta(self, filter_id: str, source: str, m_hash: str, i_hash: str, i_str: str, args: typing.Optional[typing.Dict] = None):
+    def __add_filter_meta_data(self, filter_id: str, source: str, m_hash: str, i_hash: str, i_str: str, args: typing.Optional[typing.Dict] = None):
         try:
             self.__filter_meta_data[filter_id] = {
                 FilterMetaData.source: source,
@@ -228,7 +228,7 @@ class FilterHandler:
         except Exception as ex:
             raise AddExportError(ex)
 
-    def __del_filter_meta(self, filter_id: str):
+    def __del_filter_meta_data(self, filter_id: str):
         try:
             del self.__filter_meta_data[filter_id]
         except Exception as ex:
@@ -245,11 +245,11 @@ class FilterHandler:
         with self.__lock:
             m_hash = hash_mappings(mappings=mappings)
             if identifiers:
-                i_hash, i_str = self.__add_msg_identifier(identifiers=identifiers, filter_id=id)
+                i_hash, i_str = self.__add_identifier(identifiers=identifiers, filter_id=id)
             else:
                 i_hash = None
                 i_str = source
-            self.__add_filter_meta(
+            self.__add_filter_meta_data(
                 filter_id=id,
                 source=source,
                 m_hash=m_hash,
@@ -323,9 +323,9 @@ class FilterHandler:
         with self.__lock:
             if filter_id in self.__filter_meta_data:
                 filter_md = self.__filter_meta_data[filter_id]
-                self.__del_filter_meta(filter_id=filter_id)
+                self.__del_filter_meta_data(filter_id=filter_id)
                 if filter_md[FilterMetaData.i_hash]:
-                    self.__del_msg_identifier(i_hash=filter_md[FilterMetaData.i_hash], filter_id=filter_id)
+                    self.__del_identifier(i_hash=filter_md[FilterMetaData.i_hash], filter_id=filter_id)
                 self.__del_mappings(m_hash=filter_md[FilterMetaData.m_hash], filter_id=filter_id)
                 self.__del_source(source=filter_md[FilterMetaData.source], filter_id=filter_id)
                 self.__del_filter(
