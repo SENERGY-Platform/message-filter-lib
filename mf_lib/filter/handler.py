@@ -17,9 +17,9 @@
 __all__ = ("FilterHandler", "FilterResult")
 
 from .._util import hash_dict, hash_list, get_value, json_to_str, validate
-from .. import builders
-from .exceptions import *
-from .model import *
+from ..exceptions import _exceptions
+from . import model
+import mf_lib.builders
 import typing
 import threading
 import time
@@ -37,14 +37,14 @@ def hash_mappings(mappings: typing.Dict):
     try:
         return hash_dict(mappings)
     except Exception as ex:
-        raise HashMappingsError(ex, mappings)
+        raise _exceptions.HashMappingsError(ex, mappings)
 
 
 def parse_mappings(mappings: typing.Dict) -> typing.Dict:
     try:
         parsed_mappings = {
-            MappingType.data: list(),
-            MappingType.extra: list()
+            model.MappingType.data: list(),
+            model.MappingType.extra: list()
         }
         for key, value in mappings.items():
             validate(value, str, "source path")
@@ -52,32 +52,32 @@ def parse_mappings(mappings: typing.Dict) -> typing.Dict:
             validate(dst_path, str, "destination path")
             validate(val_type, str, "value type")
             validate(m_type, str, "mapping type")
-            assert m_type in MappingType.__dict__.values()
+            assert m_type in model.MappingType.__dict__.values()
             parsed_mappings[m_type].append(
                 {
-                    Mapping.src_path: value,
-                    Mapping.dst_path: dst_path,
-                    Mapping.value_type: val_type
+                    model.Mapping.src_path: value,
+                    model.Mapping.dst_path: dst_path,
+                    model.Mapping.value_type: val_type
                 }
             )
         return parsed_mappings
     except Exception as ex:
-        raise ParseMappingsError(ex, mappings)
+        raise _exceptions.ParseMappingsError(ex, mappings)
 
 
 def mapper(mappings: typing.List, msg: typing.Dict, filter_ids: typing.Tuple) -> typing.Generator:
     for mapping in mappings:
         try:
-            src_path = mapping[Mapping.src_path].split(".")
-            yield mapping[Mapping.dst_path], type_map[mapping[Mapping.value_type]](get_value(src_path, msg, len(src_path) - 1))
+            src_path = mapping[model.Mapping.src_path].split(".")
+            yield mapping[model.Mapping.dst_path], type_map[mapping[model.Mapping.value_type]](get_value(src_path, msg, len(src_path) - 1))
         except Exception as ex:
-            raise MappingError(ex, mapping, filter_ids)
+            raise _exceptions.MappingError(ex, mapping, filter_ids)
 
 
 def validate_identifier(key: str, value: typing.Optional[typing.Union[str, int, float]] = None):
-    validate(key, str, f"identifier {Identifier.key}")
+    validate(key, str, f"identifier {model.Identifier.key}")
     if value:
-        validate(value, (str, int, float), f"identifier {Identifier.value}")
+        validate(value, (str, int, float), f"identifier {model.Identifier.value}")
     return key, value
 
 
@@ -191,24 +191,24 @@ class FilterHandler:
 
     def __add_filter_metadata(self, filter_id: str, source: str, m_hash: str, i_hash: str, i_str: str, args: typing.Optional[typing.Dict] = None):
         self.__filter_metadata[filter_id] = {
-            FilterMetadata.source: source,
-            FilterMetadata.m_hash: m_hash,
-            FilterMetadata.i_hash: i_hash,
-            FilterMetadata.i_str: i_str,
-            FilterMetadata.args: args
+            model.FilterMetadata.source: source,
+            model.FilterMetadata.m_hash: m_hash,
+            model.FilterMetadata.i_hash: i_hash,
+            model.FilterMetadata.i_str: i_str,
+            model.FilterMetadata.args: args
         }
 
     def __del_filter_metadata(self, filter_id: str):
         del self.__filter_metadata[filter_id]
 
     def __add(self, source: str, mappings: typing.Dict, id: str, identifiers: typing.Optional[list] = None, args: typing.Optional[typing.Dict] = None):
-        validate(source, str, f"filter {Filter.source}")
-        validate(mappings, dict, f"filter {Filter.mappings}")
-        validate(id, str, f"filter {Filter.id}")
+        validate(source, str, f"filter {model.Filter.source}")
+        validate(mappings, dict, f"filter {model.Filter.mappings}")
+        validate(id, str, f"filter {model.Filter.id}")
         if identifiers:
-            validate(identifiers, list, f"filter {Filter.identifiers}")
+            validate(identifiers, list, f"filter {model.Filter.identifiers}")
         if args:
-            validate(args, dict, f"filter {Filter.args}")
+            validate(args, dict, f"filter {model.Filter.args}")
         with self.__lock:
             m_hash = hash_mappings(mappings=mappings)
             if identifiers:
@@ -246,9 +246,9 @@ class FilterHandler:
             if identifier:
                 return "".join([str(msg[key]) for key in identifier[1]]) + identifier[2]
         except Exception as ex:
-            raise MessageIdentificationError(ex)
+            raise _exceptions.MessageIdentificationError(ex)
 
-    def get_results(self, message: typing.Dict, source: typing.Optional[str] = None, data_builder: typing.Optional[typing.Callable[[typing.Generator], typing.Any]] = builders.dict_builder, extra_builder: typing.Optional[typing.Callable[[typing.Generator], typing.Any]] = builders.dict_builder) -> typing.Generator[FilterResult, None, None]:
+    def get_results(self, message: typing.Dict, source: typing.Optional[str] = None, data_builder: typing.Optional[typing.Callable[[typing.Generator], typing.Any]] = mf_lib.builders.dict_builder, extra_builder: typing.Optional[typing.Callable[[typing.Generator], typing.Any]] = mf_lib.builders.dict_builder) -> typing.Generator[FilterResult, None, None]:
         """
         Generator that applies filters to a message and yields extracted data.
         :param message: Dictionary containing message data.
@@ -264,14 +264,14 @@ class FilterHandler:
                     filter_ids = tuple(self.__filters[i_str][m_hash])
                     try:
                         yield FilterResult(
-                            data=data_builder(mapper(mappings=self.__mappings[m_hash][MappingType.data], msg=message, filter_ids=filter_ids)),
-                            extra=extra_builder(mapper(mappings=self.__mappings[m_hash][MappingType.extra], msg=message, filter_ids=filter_ids)),
+                            data=data_builder(mapper(mappings=self.__mappings[m_hash][model.MappingType.data], msg=message, filter_ids=filter_ids)),
+                            extra=extra_builder(mapper(mappings=self.__mappings[m_hash][model.MappingType.extra], msg=message, filter_ids=filter_ids)),
                             filter_ids=filter_ids
                         )
                     except Exception as ex:
                         yield FilterResult(filter_ids=filter_ids, ex=ex)
             else:
-                raise NoFilterError()
+                raise _exceptions.NoFilterError()
 
     def add_filter(self, filter: typing.Dict):
         """
@@ -282,7 +282,7 @@ class FilterHandler:
         try:
             self.__add(**filter)
         except Exception as ex:
-            raise AddFilterError(ex)
+            raise _exceptions.AddFilterError(ex)
 
     def delete_filter(self, filter_id: str):
         """
@@ -296,19 +296,19 @@ class FilterHandler:
                 if filter_id in self.__filter_metadata:
                     filter_md = self.__filter_metadata[filter_id]
                     self.__del_filter_metadata(filter_id=filter_id)
-                    if filter_md[FilterMetadata.i_hash]:
-                        self.__del_identifier(i_hash=filter_md[FilterMetadata.i_hash], filter_id=filter_id)
-                    self.__del_mappings(m_hash=filter_md[FilterMetadata.m_hash], filter_id=filter_id)
-                    self.__del_source(source=filter_md[FilterMetadata.source], filter_id=filter_id)
+                    if filter_md[model.FilterMetadata.i_hash]:
+                        self.__del_identifier(i_hash=filter_md[model.FilterMetadata.i_hash], filter_id=filter_id)
+                    self.__del_mappings(m_hash=filter_md[model.FilterMetadata.m_hash], filter_id=filter_id)
+                    self.__del_source(source=filter_md[model.FilterMetadata.source], filter_id=filter_id)
                     self.__del_filter(
-                        i_str=filter_md[FilterMetadata.i_str],
-                        m_hash=filter_md[FilterMetadata.m_hash],
+                        i_str=filter_md[model.FilterMetadata.i_str],
+                        m_hash=filter_md[model.FilterMetadata.m_hash],
                         filter_id=filter_id
                     )
                 else:
-                    raise UnknownFilterIDError(filter_id=filter_id)
+                    raise _exceptions.UnknownFilterIDError(filter_id=filter_id)
         except Exception as ex:
-            raise DeleteFilterError(ex)
+            raise _exceptions.DeleteFilterError(ex)
 
     def get_filter_args(self, filter_id: str) -> typing.Dict:
         """
@@ -319,9 +319,9 @@ class FilterHandler:
         validate(filter_id, str, "filter_id")
         with self.__lock:
             if filter_id in self.__filter_metadata:
-                return self.__filter_metadata[filter_id][FilterMetadata.args]
+                return self.__filter_metadata[filter_id][model.FilterMetadata.args]
             else:
-                raise UnknownFilterIDError(filter_id=filter_id)
+                raise _exceptions.UnknownFilterIDError(filter_id=filter_id)
 
     def get_sources(self) -> typing.List:
         """

@@ -14,6 +14,15 @@
    limitations under the License.
 """
 
+__all__ = (
+    "FilterHandlerError",
+    "NoFilterError",
+    "MessageIdentificationError",
+    "AddFilterError",
+    "DeleteFilterError",
+    "UnknownFilterIDError"
+)
+
 import traceback
 
 

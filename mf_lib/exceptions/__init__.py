@@ -14,15 +14,5 @@
    limitations under the License.
 """
 
-__version__ = '0.3.1'
-__title__ = 'message-filter-lib'
-__description__ = 'Library for filtering and extracting data from messages.'
-__url__ = 'https://github.com/SENERGY-Platform/message-filter-lib'
-__author__ = 'Yann Dumont'
-__license__ = 'Apache License 2.0'
-__copyright__ = 'Copyright 2022 InfAI (CC SES)'
+from ._exceptions import *
 
-
-from .filter import *
-import mf_lib.builders
-import mf_lib.exceptions
