@@ -82,10 +82,10 @@ def validate_identifier(key: str, value: typing.Optional[typing.Union[str, int, 
 
 
 class FilterResult:
-    def __init__(self, data=None, extra=None, exports=None, ex=None):
+    def __init__(self, data=None, extra=None, filter_ids=None, ex=None):
         self.data = data
         self.extra = extra
-        self.exports = exports
+        self.filter_ids = filter_ids
         self.ex = ex
 
     def __iter__(self):
@@ -105,64 +105,61 @@ class FilterHandler:
     """
     Provides functionality for adding and removing filters as well as applying filters to messages and extracting data.
     """
-    __log_msg_prefix = "filter handler"
-    __log_err_msg_prefix = f"{__log_msg_prefix} error"
-
     def __init__(self):
         self.__lock = threading.Lock()
-        self.__msg_identifiers = dict()
-        self.__msg_filters = dict()
+        self.__identifiers = dict()
+        self.__filters = dict()
         self.__mappings = dict()
         self.__sources = set()
-        self.__exports = dict()
-        self.__mappings_export_map = dict()
-        self.__msg_identifiers_export_map = dict()
-        self.__sources_export_map = dict()
+        self.__filter_meta_data = dict()
+        self.__mappings_filter_map = dict()
+        self.__identifiers_filter_map = dict()
+        self.__sources_filter_map = dict()
         self.__sources_timestamp = None
 
-    def __add_filter(self, i_str, m_hash, export_id):
+    def __add_filter(self, i_str, m_hash, filter_id):
         try:
             try:
-                self.__msg_filters[i_str][m_hash].add(export_id)
+                self.__filters[i_str][m_hash].add(filter_id)
             except KeyError:
-                if i_str not in self.__msg_filters:
-                    self.__msg_filters[i_str] = dict()
-                if m_hash not in self.__msg_filters[i_str]:
-                    self.__msg_filters[i_str][m_hash] = {export_id}
+                if i_str not in self.__filters:
+                    self.__filters[i_str] = dict()
+                if m_hash not in self.__filters[i_str]:
+                    self.__filters[i_str][m_hash] = {filter_id}
         except Exception as ex:
             raise AddFilterError(ex)
 
-    def __del_filter(self, i_str, m_hash, export_id):
+    def __del_filter(self, i_str, m_hash, filter_id):
         try:
-            self.__msg_filters[i_str][m_hash].discard(export_id)
-            if not self.__msg_filters[i_str][m_hash]:
-                del self.__msg_filters[i_str][m_hash]
-                if not self.__msg_filters[i_str]:
-                    del self.__msg_filters[i_str]
+            self.__filters[i_str][m_hash].discard(filter_id)
+            if not self.__filters[i_str][m_hash]:
+                del self.__filters[i_str][m_hash]
+                if not self.__filters[i_str]:
+                    del self.__filters[i_str]
         except Exception as ex:
             raise DeleteFilterError(ex)
 
-    def __add_mappings(self, mappings: typing.Dict, m_hash: str, export_id: str):
+    def __add_mappings(self, mappings: typing.Dict, m_hash: str, filter_id: str):
         try:
             if m_hash not in self.__mappings:
                 self.__mappings[m_hash] = parse_mappings(mappings=mappings)
-            if m_hash not in self.__mappings_export_map:
-                self.__mappings_export_map[m_hash] = {export_id}
+            if m_hash not in self.__mappings_filter_map:
+                self.__mappings_filter_map[m_hash] = {filter_id}
             else:
-                self.__mappings_export_map[m_hash].add(export_id)
+                self.__mappings_filter_map[m_hash].add(filter_id)
         except Exception as ex:
             raise AddMappingsError(ex)
 
-    def __del_mappings(self, m_hash: str, export_id: str):
+    def __del_mappings(self, m_hash: str, filter_id: str):
         try:
-            self.__mappings_export_map[m_hash].discard(export_id)
-            if not self.__mappings_export_map[m_hash]:
+            self.__mappings_filter_map[m_hash].discard(filter_id)
+            if not self.__mappings_filter_map[m_hash]:
                 del self.__mappings[m_hash]
-                del self.__mappings_export_map[m_hash]
+                del self.__mappings_filter_map[m_hash]
         except Exception as ex:
             raise DeleteMappingsError(ex)
 
-    def __add_msg_identifier(self, identifiers: list, export_id: str):
+    def __add_msg_identifier(self, identifiers: list, filter_id: str):
         try:
             i_val_keys = list()
             i_no_val_keys = list()
@@ -179,93 +176,93 @@ class FilterHandler:
             i_values.sort()
             i_keys = i_val_keys + i_no_val_keys
             i_hash = hash_list(i_keys)
-            if i_hash not in self.__msg_identifiers:
-                self.__msg_identifiers[i_hash] = (set(i_keys), i_val_keys, "".join(i_no_val_keys), len(i_keys))
-            if i_hash not in self.__msg_identifiers_export_map:
-                self.__msg_identifiers_export_map[i_hash] = {export_id}
+            if i_hash not in self.__identifiers:
+                self.__identifiers[i_hash] = (set(i_keys), i_val_keys, "".join(i_no_val_keys), len(i_keys))
+            if i_hash not in self.__identifiers_filter_map:
+                self.__identifiers_filter_map[i_hash] = {filter_id}
             else:
-                self.__msg_identifiers_export_map[i_hash].add(export_id)
-            return i_hash, "".join(i_values) + self.__msg_identifiers[i_hash][2]
+                self.__identifiers_filter_map[i_hash].add(filter_id)
+            return i_hash, "".join(i_values) + self.__identifiers[i_hash][2]
         except Exception as ex:
             raise AddMessageIdentifierError(ex)
 
-    def __del_msg_identifier(self, i_hash: str, export_id: str):
+    def __del_msg_identifier(self, i_hash: str, filter_id: str):
         try:
-            self.__msg_identifiers_export_map[i_hash].discard(export_id)
-            if not self.__msg_identifiers_export_map[i_hash]:
-                del self.__msg_identifiers[i_hash]
-                del self.__msg_identifiers_export_map[i_hash]
+            self.__identifiers_filter_map[i_hash].discard(filter_id)
+            if not self.__identifiers_filter_map[i_hash]:
+                del self.__identifiers[i_hash]
+                del self.__identifiers_filter_map[i_hash]
         except Exception as ex:
             raise DeleteMessageIdentifierError(ex)
 
-    def __add_source(self, source: str, export_id: str):
+    def __add_source(self, source: str, filter_id: str):
         try:
             self.__sources.add(source)
-            if source not in self.__sources_export_map:
-                self.__sources_export_map[source] = {export_id}
+            if source not in self.__sources_filter_map:
+                self.__sources_filter_map[source] = {filter_id}
             else:
-                self.__sources_export_map[source].add(export_id)
+                self.__sources_filter_map[source].add(filter_id)
             self.__sources_timestamp = time.time_ns()
         except Exception as ex:
             raise AddSourceError(ex)
 
-    def __del_source(self, source: str, export_id: str):
+    def __del_source(self, source: str, filter_id: str):
         try:
-            self.__sources_export_map[source].discard(export_id)
-            if not self.__sources_export_map[source]:
+            self.__sources_filter_map[source].discard(filter_id)
+            if not self.__sources_filter_map[source]:
                 self.__sources.discard(source)
-                del self.__sources_export_map[source]
+                del self.__sources_filter_map[source]
                 self.__sources_timestamp = time.time_ns()
         except Exception as ex:
             raise DeleteSourceError(ex)
 
-    def __add_export(self, export_id: str, source: str, m_hash: str, i_hash: str, i_str: str, export_args: typing.Optional[typing.Dict] = None):
+    def __add_filter_meta(self, filter_id: str, source: str, m_hash: str, i_hash: str, i_str: str, args: typing.Optional[typing.Dict] = None):
         try:
-            self.__exports[export_id] = {
+            self.__filter_meta_data[filter_id] = {
                 Export.source: source,
                 Export.m_hash: m_hash,
                 Export.i_hash: i_hash,
                 Export.i_str: i_str,
-                Export.args: export_args
+                Export.args: args
             }
         except Exception as ex:
             raise AddExportError(ex)
 
-    def __del_export(self, export_id: str):
+    def __del_filter_meta(self, filter_id: str):
         try:
-            del self.__exports[export_id]
+            del self.__filter_meta_data[filter_id]
         except Exception as ex:
             raise DeleteExportError(ex)
 
-    def __add(self, source: str, mappings: typing.Dict, export_id: str, identifiers: typing.Optional[list] = None, export_args: typing.Optional[typing.Dict] = None):
+    def __add(self, source: str, mappings: typing.Dict, id: str, identifiers: typing.Optional[list] = None, args: typing.Optional[typing.Dict] = None):
         validate(source, str, f"filter {Filter.source}")
         validate(mappings, dict, f"filter {Filter.mappings}")
-        validate(export_id, str, f"filter {Filter.export_id}")
+        validate(id, str, f"filter {Filter.export_id}")
         if identifiers:
             validate(identifiers, list, f"filter {Filter.identifiers}")
-        if export_args:
-            validate(export_args, dict, f"filter {Filter.export_args}")
+        if args:
+            validate(args, dict, f"filter {Filter.export_args}")
         with self.__lock:
             m_hash = hash_mappings(mappings=mappings)
             if identifiers:
-                i_hash, i_str = self.__add_msg_identifier(identifiers=identifiers, export_id=export_id)
+                i_hash, i_str = self.__add_msg_identifier(identifiers=identifiers, filter_id=id)
             else:
                 i_hash = None
                 i_str = source
-            self.__add_export(
-                export_id=export_id,
+            self.__add_filter_meta(
+                filter_id=id,
                 source=source,
                 m_hash=m_hash,
                 i_hash=i_hash,
                 i_str=i_str,
-                export_args=export_args
+                args=args
             )
-            self.__add_mappings(mappings=mappings, m_hash=m_hash, export_id=export_id)
-            self.__add_source(source=source, export_id=export_id)
+            self.__add_mappings(mappings=mappings, m_hash=m_hash, filter_id=id)
+            self.__add_source(source=source, filter_id=id)
             self.__add_filter(
                 i_str=i_str,
                 m_hash=m_hash,
-                export_id=export_id
+                filter_id=id
             )
             self.__sources_timestamp = time.time_ns()
 
@@ -273,13 +270,13 @@ class FilterHandler:
         try:
             msg_keys = set(msg.keys())
             identifier = None
-            for i_hash in self.__msg_identifiers:
-                if self.__msg_identifiers[i_hash][0].issubset(msg_keys):
+            for i_hash in self.__identifiers:
+                if self.__identifiers[i_hash][0].issubset(msg_keys):
                     if not identifier:
-                        identifier = self.__msg_identifiers[i_hash]
+                        identifier = self.__identifiers[i_hash]
                     else:
-                        if self.__msg_identifiers[i_hash][3] > identifier[3]:
-                            identifier = self.__msg_identifiers[i_hash]
+                        if self.__identifiers[i_hash][3] > identifier[3]:
+                            identifier = self.__identifiers[i_hash]
             if identifier:
                 return "".join([str(msg[key]) for key in identifier[1]]) + identifier[2]
         except Exception as ex:
@@ -287,7 +284,7 @@ class FilterHandler:
 
     def get_results(self, message: typing.Dict, source: typing.Optional[str] = None, builder: typing.Optional[typing.Callable[[typing.Generator], typing.Any]] = builders.dict_builder) -> typing.Generator[FilterResult, None, None]:
         """
-        Generator that applies filters to a message and yields extracted data for exports.
+        Generator that applies filters to a message and yields extracted data.
         :param message: Dictionary containing message data.
         :param source: Message source.
         :param builder: Builder function for custom data structures. Default is ew_lib.builders.dict_builder.
@@ -295,13 +292,13 @@ class FilterHandler:
         """
         with self.__lock:
             i_str = self.__identify_msg(msg=message) or source
-            if i_str in self.__msg_filters:
-                for m_hash in self.__msg_filters[i_str]:
+            if i_str in self.__filters:
+                for m_hash in self.__filters[i_str]:
                     try:
                         yield FilterResult(
                             data=builder(mapper(self.__mappings[m_hash][MappingType.data], message)),
                             extra=builder(mapper(self.__mappings[m_hash][MappingType.extra], message)),
-                            exports=tuple(self.__msg_filters[i_str][m_hash])
+                            filter_ids=tuple(self.__filters[i_str][m_hash])
                         )
                     except Exception as ex:
                         yield FilterResult(ex=ex)
@@ -316,35 +313,35 @@ class FilterHandler:
         """
         self.__add(**filter)
 
-    def delete_filter(self, export_id: str):
+    def delete_filter(self, filter_id: str):
         """
         Delete a filter.
-        :param export_id: ID of an export of which the filter is to be deleted.
+        :param filter_id: ID of a filter to be deleted.
         :return: None
         """
-        validate(export_id, str, Filter.export_id)
+        validate(filter_id, str, Filter.export_id)
         with self.__lock:
-            if export_id in self.__exports:
-                export = self.__exports[export_id]
-                self.__del_export(export_id=export_id)
-                if export[Export.i_hash]:
-                    self.__del_msg_identifier(i_hash=export[Export.i_hash], export_id=export_id)
-                self.__del_mappings(m_hash=export[Export.m_hash], export_id=export_id)
-                self.__del_source(source=export[Export.source], export_id=export_id)
+            if filter_id in self.__filter_meta_data:
+                filter_md = self.__filter_meta_data[filter_id]
+                self.__del_filter_meta(filter_id=filter_id)
+                if filter_md[Export.i_hash]:
+                    self.__del_msg_identifier(i_hash=filter_md[Export.i_hash], filter_id=filter_id)
+                self.__del_mappings(m_hash=filter_md[Export.m_hash], filter_id=filter_id)
+                self.__del_source(source=filter_md[Export.source], filter_id=filter_id)
                 self.__del_filter(
-                    i_str=export[Export.i_str],
-                    m_hash=export[Export.m_hash],
-                    export_id=export_id
+                    i_str=filter_md[Export.i_str],
+                    m_hash=filter_md[Export.m_hash],
+                    filter_id=filter_id
                 )
 
-    def get_export_args(self, export_id: str) -> typing.Dict:
+    def get_filter_args(self, filter_id: str) -> typing.Dict:
         """
-        Get export arguments.
-        :param export_id: ID of an export.
-        :return: Dictionary containing args of an export.
+        Get filter arguments.
+        :param filter_id: ID of a filter.
+        :return: Dictionary containing args of a filter.
         """
         with self.__lock:
-            return self.__exports[export_id][Export.args]
+            return self.__filter_meta_data[filter_id][Export.args]
 
     def get_sources(self) -> typing.List:
         """
