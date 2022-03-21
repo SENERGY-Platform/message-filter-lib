@@ -15,7 +15,7 @@
 """
 
 __version__ = '0.1.0'
-__title__ = 'export-worker-lib'
+__title__ = 'message-filter-lib'
 __description__ = ''
 __url__ = 'https://github.com/SENERGY-Platform/message-filter-lib'
 __author__ = 'Yann Dumont'
