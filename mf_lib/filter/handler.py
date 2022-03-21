@@ -65,13 +65,13 @@ def parse_mappings(mappings: typing.Dict) -> typing.Dict:
         raise ParseMappingsError(ex, mappings)
 
 
-def mapper(mappings: typing.List, msg: typing.Dict) -> typing.Generator:
+def mapper(mappings: typing.List, msg: typing.Dict, filter_ids: typing.Tuple) -> typing.Generator:
     for mapping in mappings:
         try:
             src_path = mapping[Mapping.src_path].split(".")
             yield mapping[Mapping.dst_path], type_map[mapping[Mapping.value_type]](get_value(src_path, msg, len(src_path) - 1))
         except Exception as ex:
-            raise MappingError(ex, mapping)
+            raise MappingError(ex, mapping, filter_ids)
 
 
 def validate_identifier(key: str, value: typing.Optional[typing.Union[str, int, float]] = None):
@@ -261,14 +261,15 @@ class FilterHandler:
             i_str = self.__identify_msg(msg=message) or source
             if i_str in self.__filters:
                 for m_hash in self.__filters[i_str]:
+                    filter_ids = tuple(self.__filters[i_str][m_hash])
                     try:
                         yield FilterResult(
-                            data=data_builder(mapper(self.__mappings[m_hash][MappingType.data], message)),
-                            extra=extra_builder(mapper(self.__mappings[m_hash][MappingType.extra], message)),
-                            filter_ids=tuple(self.__filters[i_str][m_hash])
+                            data=data_builder(mapper(mappings=self.__mappings[m_hash][MappingType.data], msg=message, filter_ids=filter_ids)),
+                            extra=extra_builder(mapper(mappings=self.__mappings[m_hash][MappingType.extra], msg=message, filter_ids=filter_ids)),
+                            filter_ids=filter_ids
                         )
                     except Exception as ex:
-                        yield FilterResult(filter_ids=tuple(self.__filters[i_str][m_hash]), ex=ex)
+                        yield FilterResult(filter_ids=filter_ids, ex=ex)
             else:
                 raise NoFilterError()
 

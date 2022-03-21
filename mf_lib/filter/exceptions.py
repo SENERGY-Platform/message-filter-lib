@@ -39,8 +39,8 @@ class NoFilterError(FilterHandlerError):
 
 
 class MappingError(FilterHandlerError):
-    def __init__(self, ex, mapping):
-        super().__init__(msg="mapping error", msg_args=f"mapping={mapping}", ex=ex)
+    def __init__(self, ex, mapping, filter_ids):
+        super().__init__(msg="mapping error", msg_args=f"mapping={mapping} filters={filter_ids}", ex=ex)
 
 
 class HashMappingsError(FilterHandlerError):
