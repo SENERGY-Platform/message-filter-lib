@@ -39,7 +39,7 @@ class MappingType:
     extra = "extra"
 
 
-class FilterMetaData:
+class FilterMetadata:
     source = "source"
     m_hash = "m_hash"
     i_hash = "i_hash"

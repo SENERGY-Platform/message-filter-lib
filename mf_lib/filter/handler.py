@@ -219,11 +219,11 @@ class FilterHandler:
     def __add_filter_metadata(self, filter_id: str, source: str, m_hash: str, i_hash: str, i_str: str, args: typing.Optional[typing.Dict] = None):
         try:
             self.__filter_metadata[filter_id] = {
-                FilterMetaData.source: source,
-                FilterMetaData.m_hash: m_hash,
-                FilterMetaData.i_hash: i_hash,
-                FilterMetaData.i_str: i_str,
-                FilterMetaData.args: args
+                FilterMetadata.source: source,
+                FilterMetadata.m_hash: m_hash,
+                FilterMetadata.i_hash: i_hash,
+                FilterMetadata.i_str: i_str,
+                FilterMetadata.args: args
             }
         except Exception as ex:
             raise AddFilterMetadataError(ex)
@@ -324,13 +324,13 @@ class FilterHandler:
             if filter_id in self.__filter_metadata:
                 filter_md = self.__filter_metadata[filter_id]
                 self.__del_filter_metadata(filter_id=filter_id)
-                if filter_md[FilterMetaData.i_hash]:
-                    self.__del_identifier(i_hash=filter_md[FilterMetaData.i_hash], filter_id=filter_id)
-                self.__del_mappings(m_hash=filter_md[FilterMetaData.m_hash], filter_id=filter_id)
-                self.__del_source(source=filter_md[FilterMetaData.source], filter_id=filter_id)
+                if filter_md[FilterMetadata.i_hash]:
+                    self.__del_identifier(i_hash=filter_md[FilterMetadata.i_hash], filter_id=filter_id)
+                self.__del_mappings(m_hash=filter_md[FilterMetadata.m_hash], filter_id=filter_id)
+                self.__del_source(source=filter_md[FilterMetadata.source], filter_id=filter_id)
                 self.__del_filter(
-                    i_str=filter_md[FilterMetaData.i_str],
-                    m_hash=filter_md[FilterMetaData.m_hash],
+                    i_str=filter_md[FilterMetadata.i_str],
+                    m_hash=filter_md[FilterMetadata.m_hash],
                     filter_id=filter_id
                 )
 
@@ -341,7 +341,7 @@ class FilterHandler:
         :return: Dictionary containing args of a filter.
         """
         with self.__lock:
-            return self.__filter_metadata[filter_id][FilterMetaData.args]
+            return self.__filter_metadata[filter_id][FilterMetadata.args]
 
     def get_sources(self) -> typing.List:
         """
