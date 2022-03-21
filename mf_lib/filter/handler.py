@@ -111,7 +111,7 @@ class FilterHandler:
         self.__filters = dict()
         self.__mappings = dict()
         self.__sources = set()
-        self.__filter_meta_data = dict()
+        self.__filter_metadata = dict()
         self.__mappings_filter_map = dict()
         self.__identifiers_filter_map = dict()
         self.__sources_filter_map = dict()
@@ -216,9 +216,9 @@ class FilterHandler:
         except Exception as ex:
             raise DeleteSourceError(ex)
 
-    def __add_filter_meta_data(self, filter_id: str, source: str, m_hash: str, i_hash: str, i_str: str, args: typing.Optional[typing.Dict] = None):
+    def __add_filter_metadata(self, filter_id: str, source: str, m_hash: str, i_hash: str, i_str: str, args: typing.Optional[typing.Dict] = None):
         try:
-            self.__filter_meta_data[filter_id] = {
+            self.__filter_metadata[filter_id] = {
                 FilterMetaData.source: source,
                 FilterMetaData.m_hash: m_hash,
                 FilterMetaData.i_hash: i_hash,
@@ -226,13 +226,13 @@ class FilterHandler:
                 FilterMetaData.args: args
             }
         except Exception as ex:
-            raise AddExportError(ex)
+            raise AddFilterMetadataError(ex)
 
-    def __del_filter_meta_data(self, filter_id: str):
+    def __del_filter_metadata(self, filter_id: str):
         try:
-            del self.__filter_meta_data[filter_id]
+            del self.__filter_metadata[filter_id]
         except Exception as ex:
-            raise DeleteExportError(ex)
+            raise DeleteFilterMetadataError(ex)
 
     def __add(self, source: str, mappings: typing.Dict, id: str, identifiers: typing.Optional[list] = None, args: typing.Optional[typing.Dict] = None):
         validate(source, str, f"filter {Filter.source}")
@@ -249,7 +249,7 @@ class FilterHandler:
             else:
                 i_hash = None
                 i_str = source
-            self.__add_filter_meta_data(
+            self.__add_filter_metadata(
                 filter_id=id,
                 source=source,
                 m_hash=m_hash,
@@ -321,9 +321,9 @@ class FilterHandler:
         """
         validate(filter_id, str, Filter.id)
         with self.__lock:
-            if filter_id in self.__filter_meta_data:
-                filter_md = self.__filter_meta_data[filter_id]
-                self.__del_filter_meta_data(filter_id=filter_id)
+            if filter_id in self.__filter_metadata:
+                filter_md = self.__filter_metadata[filter_id]
+                self.__del_filter_metadata(filter_id=filter_id)
                 if filter_md[FilterMetaData.i_hash]:
                     self.__del_identifier(i_hash=filter_md[FilterMetaData.i_hash], filter_id=filter_id)
                 self.__del_mappings(m_hash=filter_md[FilterMetaData.m_hash], filter_id=filter_id)
@@ -341,7 +341,7 @@ class FilterHandler:
         :return: Dictionary containing args of a filter.
         """
         with self.__lock:
-            return self.__filter_meta_data[filter_id][FilterMetaData.args]
+            return self.__filter_metadata[filter_id][FilterMetaData.args]
 
     def get_sources(self) -> typing.List:
         """

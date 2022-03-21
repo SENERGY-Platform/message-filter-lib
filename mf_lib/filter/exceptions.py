@@ -93,11 +93,11 @@ class DeleteMessageIdentifierError(FilterHandlerError):
         super().__init__(msg="deleting message identifier failed", ex=ex)
 
 
-class AddExportError(FilterHandlerError):
+class AddFilterMetadataError(FilterHandlerError):
     def __init__(self, ex):
-        super().__init__(msg="adding export failed", ex=ex)
+        super().__init__(msg="adding filter metadata failed", ex=ex)
 
 
-class DeleteExportError(FilterHandlerError):
+class DeleteFilterMetadataError(FilterHandlerError):
     def __init__(self, ex):
-        super().__init__(msg="deleting export failed", ex=ex)
+        super().__init__(msg="deleting metadata failed", ex=ex)
