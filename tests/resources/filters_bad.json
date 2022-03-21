@@ -1,0 +1,274 @@
+[
+  {
+    "action": "add",
+    "filter": null
+  },
+  {
+    "action": "delete",
+    "id": null
+  },
+  {
+    "action": "delete",
+    "id": 1
+  },
+  {
+    "action": "delete",
+    "id": "test"
+  },
+  {
+    "action": "add",
+    "filter": "test"
+  },
+  {
+    "action": "add",
+    "filter": [
+      null
+    ]
+  },
+  {
+    "action": "add",
+    "filter": {
+      "test": null
+    }
+  },
+  {
+    "action": "add",
+    "filter": {
+      "id": "filter-3",
+      "test": null
+    }
+  },
+  {
+    "action": "add",
+    "filter": {
+      "identifiers": [
+        {
+          "key": "id_a",
+          "value": "a-1"
+        }
+      ],
+      "mappings": {
+        "val:int": "val"
+      },
+      "id": "filter-4"
+    }
+  },
+  {
+    "action": "add",
+    "filter": {
+      "source": "src_1",
+      "identifiers": [
+        {
+          "key": "id_a",
+          "value": "a-1"
+        }
+      ],
+      "mappings": {
+        "val:int": "val"
+      },
+      "id": "filter-5",
+      "test": null
+    }
+  },
+  {
+    "action": "add",
+    "filter": {
+      "source": null,
+      "identifiers": null,
+      "mappings": null,
+      "id": null
+    }
+  },
+  {
+    "action": "add",
+    "filter": {
+      "source": 1,
+      "identifiers": null,
+      "mappings": 1,
+      "id": 1
+    }
+  },
+  {
+    "action": "add",
+    "filter": {
+      "source": "",
+      "identifiers": null,
+      "mappings": "",
+      "id": ""
+    }
+  },
+  {
+    "action": "add",
+    "filter": {
+      "source": "src_1",
+      "identifiers": null,
+      "mappings": {},
+      "id": "filter-6"
+    }
+  },
+  {
+    "action": "add",
+    "filter": {
+      "source": "src_1",
+      "identifiers": 1,
+      "mappings": {
+        "val:int": "val"
+      },
+      "id": "filter-7"
+    }
+  },
+  {
+    "action": "add",
+    "filter": {
+      "source": "src_1",
+      "identifiers": null,
+      "mappings": {
+        "val:int": null
+      },
+      "id": "filter-8"
+    }
+  },
+  {
+    "action": "add",
+    "filter": {
+      "source": "src_1",
+      "identifiers": null,
+      "mappings": {
+        "val": "val"
+      },
+      "id": "filter-9"
+    }
+  },
+  {
+    "action": "add",
+    "filter": {
+      "source": "src_1",
+      "identifiers": null,
+      "mappings": {
+        "val:": "val"
+      },
+      "id": "filter-10"
+    }
+  },
+  {
+    "action": "add",
+    "filter": {
+      "source": "src_1",
+      "identifiers": null,
+      "mappings": {
+        ":int": "val"
+      },
+      "id": "filter-11"
+    }
+  },
+  {
+    "action": "add",
+    "filter": {
+      "source": "src_1",
+      "identifiers": [
+        {
+          "value": "a-1"
+        }
+      ],
+      "mappings": {
+        "val:int": "val"
+      },
+      "id": "filter-12"
+    }
+  },
+  {
+    "action": "add",
+    "filter": {
+      "source": "src_1",
+      "identifiers": [
+        {
+          "key": null,
+          "value": "a-1"
+        }
+      ],
+      "mappings": {
+        "val:int": "val"
+      },
+      "id": "filter-13"
+    }
+  },
+  {
+    "action": "add",
+    "filter": {
+      "source": "src_1",
+      "identifiers": [
+        {
+          "key": 1,
+          "value": "a-1"
+        }
+      ],
+      "mappings": {
+        "val:int": "val"
+      },
+      "id": "filter-14"
+    }
+  },
+  {
+    "action": "add",
+    "filter": {
+      "source": "src_1",
+      "identifiers": [
+        {
+          "key": "",
+          "value": "a-1"
+        }
+      ],
+      "mappings": {
+        "val:int": "val"
+      },
+      "id": "filter-15"
+    }
+  },
+  {
+    "action": "add",
+    "filter": {
+      "source": "src_1",
+      "identifiers": [
+        {
+          "test": "test"
+        }
+      ],
+      "mappings": {
+        "val:int": "val"
+      },
+      "id": "filter-16"
+    }
+  },
+  {
+    "action": "add",
+    "filter": {
+      "source": "src_1",
+      "identifiers": [
+        {
+          "key": "id_a",
+          "value": "a-1"
+        }
+      ],
+      "mappings": {
+        "val:int:data": "test"
+      },
+      "id": "filter-18"
+    }
+  },
+  {
+    "action": "add",
+    "filter": {
+      "source": "src_1",
+      "identifiers": [
+        {
+          "key": "id_a",
+          "value": "a-1"
+        }
+      ],
+      "mappings": {
+        "val:int:data": "val"
+      },
+      "id": "filter-19"
+    }
+  }
+]

@@ -1,0 +1,64 @@
+{
+  "src_1": [
+    {
+      "id_a": "a-1",
+      "val": 1
+    },
+    {
+      "id_a": "a-1",
+      "id_b": "b-1",
+      "val": 2
+    },
+    {
+      "id_a": "a-1",
+      "id_b": "b-2",
+      "val": 3
+    },
+    {
+      "id_a": "a-1",
+      "id_b": "b-1",
+      "id_c": "c-1",
+      "val": 4
+    },
+    {
+      "id_d": "d-1",
+      "id_e": "e-1",
+      "val": 5
+    },
+    {
+      "id_d": "d-1",
+      "id_f": "f-1",
+      "val": 6
+    },
+    {
+      "id_g": "g-1",
+      "data": {
+        "val": 7,
+        "sub": {
+          "val": 7
+        }
+      }
+    },
+    {
+      "id_h": "h-1",
+      "val_int": 8,
+      "val_float": 8.0,
+      "val_str": "eight",
+      "val_bool": true,
+      "val_json": {
+        "key": "val"
+      }
+    },
+    {
+      "id_i": "i-1",
+      "data": {
+        "val": 9
+      }
+    }
+  ],
+  "src_2": [
+    {
+      "val": 10
+    }
+  ]
+}
