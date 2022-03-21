@@ -127,12 +127,12 @@ FilterHandler objects provide the following methods:
 `add_filter(filter)`: Add a filter with the structure defined in [Filters](#filters). The _filter_ argument requires a dictionary.
 Raises AddFilterError.
 
-`delete_filter(filter_id)`: Removes a filter by passing the ID of a filter as a string to the _filter_id_ argument.
+`delete_filter(id)`: Removes a filter by passing the ID of a filter as a string to the _id_ argument.
 Raises DeleteFilterError.
 
 `get_sources()`: Returns a list of strings containing all sources added by filters.
 
-`get_filter_args(filter_id)`: Returns a dictionary with filter arguments corresponding to the filter ID provided as a string to the _filter_id_ argument.
+`get_filter_args(id)`: Returns a dictionary with filter arguments corresponding to the filter ID provided as a string to the _id_ argument.
 Raises UnknownFilterIDError.
 
 `get_results(message, source, data_builder, extra_builder)`: This method is used to apply filters by passing a message as a dictionary to the _message_ argument. 
