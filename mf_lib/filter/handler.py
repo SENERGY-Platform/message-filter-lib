@@ -22,7 +22,6 @@ from . import model
 import mf_lib.builders
 import typing
 import threading
-import time
 
 type_map = {
     "int": int,
