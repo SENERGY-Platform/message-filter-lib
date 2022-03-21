@@ -63,41 +63,6 @@ class DeleteFilterError(FilterHandlerError):
         super().__init__(msg="deleting filter failed", ex=ex)
 
 
-class AddMappingsError(FilterHandlerError):
-    def __init__(self, ex):
-        super().__init__(msg="adding mappings failed", ex=ex)
-
-
-class DeleteMappingsError(FilterHandlerError):
-    def __init__(self, ex):
-        super().__init__(msg="deleting mappings failed", ex=ex)
-
-
-class AddSourceError(FilterHandlerError):
-    def __init__(self, ex):
-        super().__init__(msg="adding source failed", ex=ex)
-
-
-class DeleteSourceError(FilterHandlerError):
-    def __init__(self, ex):
-        super().__init__(msg="deleting source failed", ex=ex)
-
-
-class AddMessageIdentifierError(FilterHandlerError):
-    def __init__(self, ex):
-        super().__init__(msg="adding message identifier failed", ex=ex)
-
-
-class DeleteMessageIdentifierError(FilterHandlerError):
-    def __init__(self, ex):
-        super().__init__(msg="deleting message identifier failed", ex=ex)
-
-
-class AddFilterMetadataError(FilterHandlerError):
-    def __init__(self, ex):
-        super().__init__(msg="adding filter metadata failed", ex=ex)
-
-
-class DeleteFilterMetadataError(FilterHandlerError):
-    def __init__(self, ex):
-        super().__init__(msg="deleting metadata failed", ex=ex)
+class UnknownFilterIDError(FilterHandlerError):
+    def __init__(self, filter_id):
+        super().__init__(msg=f"filter ID '{filter_id}' unknown")
