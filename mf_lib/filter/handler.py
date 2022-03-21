@@ -219,11 +219,11 @@ class FilterHandler:
     def __add_filter_meta(self, filter_id: str, source: str, m_hash: str, i_hash: str, i_str: str, args: typing.Optional[typing.Dict] = None):
         try:
             self.__filter_meta_data[filter_id] = {
-                Export.source: source,
-                Export.m_hash: m_hash,
-                Export.i_hash: i_hash,
-                Export.i_str: i_str,
-                Export.args: args
+                FilterMetaData.source: source,
+                FilterMetaData.m_hash: m_hash,
+                FilterMetaData.i_hash: i_hash,
+                FilterMetaData.i_str: i_str,
+                FilterMetaData.args: args
             }
         except Exception as ex:
             raise AddExportError(ex)
@@ -237,11 +237,11 @@ class FilterHandler:
     def __add(self, source: str, mappings: typing.Dict, id: str, identifiers: typing.Optional[list] = None, args: typing.Optional[typing.Dict] = None):
         validate(source, str, f"filter {Filter.source}")
         validate(mappings, dict, f"filter {Filter.mappings}")
-        validate(id, str, f"filter {Filter.export_id}")
+        validate(id, str, f"filter {Filter.id}")
         if identifiers:
             validate(identifiers, list, f"filter {Filter.identifiers}")
         if args:
-            validate(args, dict, f"filter {Filter.export_args}")
+            validate(args, dict, f"filter {Filter.args}")
         with self.__lock:
             m_hash = hash_mappings(mappings=mappings)
             if identifiers:
@@ -319,18 +319,18 @@ class FilterHandler:
         :param filter_id: ID of a filter to be deleted.
         :return: None
         """
-        validate(filter_id, str, Filter.export_id)
+        validate(filter_id, str, Filter.id)
         with self.__lock:
             if filter_id in self.__filter_meta_data:
                 filter_md = self.__filter_meta_data[filter_id]
                 self.__del_filter_meta(filter_id=filter_id)
-                if filter_md[Export.i_hash]:
-                    self.__del_msg_identifier(i_hash=filter_md[Export.i_hash], filter_id=filter_id)
-                self.__del_mappings(m_hash=filter_md[Export.m_hash], filter_id=filter_id)
-                self.__del_source(source=filter_md[Export.source], filter_id=filter_id)
+                if filter_md[FilterMetaData.i_hash]:
+                    self.__del_msg_identifier(i_hash=filter_md[FilterMetaData.i_hash], filter_id=filter_id)
+                self.__del_mappings(m_hash=filter_md[FilterMetaData.m_hash], filter_id=filter_id)
+                self.__del_source(source=filter_md[FilterMetaData.source], filter_id=filter_id)
                 self.__del_filter(
-                    i_str=filter_md[Export.i_str],
-                    m_hash=filter_md[Export.m_hash],
+                    i_str=filter_md[FilterMetaData.i_str],
+                    m_hash=filter_md[FilterMetaData.m_hash],
                     filter_id=filter_id
                 )
 
@@ -341,7 +341,7 @@ class FilterHandler:
         :return: Dictionary containing args of a filter.
         """
         with self.__lock:
-            return self.__filter_meta_data[filter_id][Export.args]
+            return self.__filter_meta_data[filter_id][FilterMetaData.args]
 
     def get_sources(self) -> typing.List:
         """

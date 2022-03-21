@@ -19,8 +19,8 @@ class Filter:
     source = "source"
     identifiers = "identifiers"
     mappings = "mappings"
-    export_id = "export_id"
-    export_args = "export_args"
+    id = "id"
+    args = "args"
 
 
 class Identifier:
@@ -39,7 +39,7 @@ class MappingType:
     extra = "extra"
 
 
-class Export:
+class FilterMetaData:
     source = "source"
     m_hash = "m_hash"
     i_hash = "i_hash"
