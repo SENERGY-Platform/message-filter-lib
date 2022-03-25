@@ -16,21 +16,12 @@
 
 __all__ = ("FilterHandler", "FilterResult")
 
-from .._util import hash_dict, hash_list, get_value, to_json, to_any, validate
+from .._util import hash_dict, hash_list, get_value, validate
 from ..exceptions import _exceptions
 from . import model
 import mf_lib.builders
 import typing
 import threading
-
-type_map = {
-    "int": int,
-    "float": float,
-    "string": str,
-    "bool": bool,
-    "string_json": to_json,
-    "any": to_any
-}
 
 
 def hash_mappings(mappings: typing.Dict):
@@ -48,16 +39,14 @@ def parse_mappings(mappings: typing.Dict) -> typing.Dict:
         }
         for key, value in mappings.items():
             validate(value, str, "source path")
-            dst_path, val_type, m_type = key.split(":")
+            dst_path, m_type = key.split(":")
             validate(dst_path, str, "destination path")
-            validate(val_type, str, "value type")
             validate(m_type, str, "mapping type")
             assert m_type in model.MappingType.__dict__.values()
             parsed_mappings[m_type].append(
                 {
                     model.Mapping.src_path: value,
-                    model.Mapping.dst_path: dst_path,
-                    model.Mapping.value_type: val_type
+                    model.Mapping.dst_path: dst_path
                 }
             )
         return parsed_mappings
@@ -69,7 +58,7 @@ def mapper(mappings: typing.List, msg: typing.Dict, filter_ids: typing.Tuple) ->
     for mapping in mappings:
         try:
             src_path = mapping[model.Mapping.src_path].split(".")
-            yield mapping[model.Mapping.dst_path], type_map[mapping[model.Mapping.value_type]](get_value(src_path, msg, len(src_path) - 1))
+            yield mapping[model.Mapping.dst_path], get_value(src_path, msg, len(src_path) - 1)
         except Exception as ex:
             raise _exceptions.MappingError(ex, mapping, filter_ids)
 

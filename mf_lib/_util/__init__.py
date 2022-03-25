@@ -16,7 +16,6 @@
 
 import typing
 import hashlib
-import json
 
 
 def hash_str(obj: str) -> str:
@@ -37,14 +36,6 @@ def get_value(path: typing.List, obj: typing.Dict, size: int, pos: typing.Option
     if pos < size:
         return get_value(path, obj[path[pos]], size, pos + 1)
     return obj[path[pos]]
-
-
-def to_json(obj):
-    return json.dumps(obj, separators=(',', ':'))
-
-
-def to_any(obj):
-    return obj
 
 
 def validate(obj, cls, name):
