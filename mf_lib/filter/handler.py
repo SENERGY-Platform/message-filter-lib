@@ -16,7 +16,7 @@
 
 __all__ = ("FilterHandler", "FilterResult")
 
-from .._util import hash_dict, hash_list, get_value, json_to_str, any_to_any, validate
+from .._util import hash_dict, hash_list, get_value, to_json, to_any, validate
 from ..exceptions import _exceptions
 from . import model
 import mf_lib.builders
@@ -28,8 +28,8 @@ type_map = {
     "float": float,
     "string": str,
     "bool": bool,
-    "string_json": json_to_str,
-    "any": any_to_any
+    "string_json": to_json,
+    "any": to_any
 }
 
 

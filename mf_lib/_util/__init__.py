@@ -39,11 +39,11 @@ def get_value(path: typing.List, obj: typing.Dict, size: int, pos: typing.Option
     return obj[path[pos]]
 
 
-def json_to_str(obj):
+def to_json(obj):
     return json.dumps(obj, separators=(',', ':'))
 
 
-def any_to_any(obj):
+def to_any(obj):
     return obj
 
 
