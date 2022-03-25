@@ -43,6 +43,10 @@ def json_to_str(obj):
     return json.dumps(obj, separators=(',', ':'))
 
 
+def any_to_any(obj):
+    return obj
+
+
 def validate(obj, cls, name):
     assert obj, f"'{name}' can't be None"
     assert isinstance(obj, cls), f"'{name}' can't be of type '{type(obj).__name__}'"
