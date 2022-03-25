@@ -112,7 +112,7 @@
       "source": "src_1",
       "identifiers": 1,
       "mappings": {
-        "val:int": "val"
+        "val:data": "val"
       },
       "id": "filter-7"
     }
@@ -123,7 +123,7 @@
       "source": "src_1",
       "identifiers": null,
       "mappings": {
-        "val:int": null
+        "val:data": null
       },
       "id": "filter-8"
     }
@@ -156,7 +156,7 @@
       "source": "src_1",
       "identifiers": null,
       "mappings": {
-        ":int": "val"
+        ":": "val"
       },
       "id": "filter-11"
     }
@@ -171,7 +171,7 @@
         }
       ],
       "mappings": {
-        "val:int": "val"
+        "val:data": "val"
       },
       "id": "filter-12"
     }
@@ -250,7 +250,7 @@
         }
       ],
       "mappings": {
-        "val:int:data": "test"
+        "val:data": "test"
       },
       "id": "filter-18"
     }
@@ -266,7 +266,7 @@
         }
       ],
       "mappings": {
-        "val:int:data": "val"
+        "val:data": "val"
       },
       "id": "filter-19"
     }
