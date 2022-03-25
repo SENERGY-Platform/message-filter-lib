@@ -34,7 +34,7 @@ Replace 'X.X.X' with the desired version.
 ## Filters
 
 Filters are used to identify messages and extract data.
-A filter is composed of an ID, a source from which the messages originate, mappings for data extraction as well as type conversion, optional message identifiers and filter arguments.
+A filter is composed of an ID, a source from which the messages originate, mappings for data extraction, optional message identifiers and filter arguments.
 The latter can be any information that is necessary for the handling of extracted data.
 
 The structure of a filter is shown below:
@@ -44,7 +44,7 @@ The structure of a filter is shown below:
     "id": "<filter id>",
     "source": "<message source>",
     "mappings": {
-        "<target path>:<value type>:<mapping type>": "<source path>"
+        "<target path>:<mapping type>": "<source path>"
     },
     "identifiers": [
         {
@@ -61,14 +61,14 @@ The structure of a filter is shown below:
 
 ### Mappings
 
-A mappings are specified as a dictionary. A key consists of a target path under which data is to be extracted, a value type to which the data is to be converted and a mapping type.
+A mappings are specified as a dictionary. A key consists of a target path under which data is to be extracted and a mapping type.
 The mapping types _data_ and _extra_ are available. The _data_ type defines which data will be extracted. 
 Additional information that is relevant for handling the data, such as a timestamp, is extracted by the _extra_ type.
 The source path to the message data to be extracted is specified as the value:
 
 ```python
 {
-    "<target path>:<value type>:<mapping type>": "<source path>"
+    "<target path>:<mapping type>": "<source path>"
 }
 ```
 
