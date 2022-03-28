@@ -54,13 +54,13 @@ def parse_mappings(mappings: typing.Dict) -> typing.Dict:
         raise _exceptions.ParseMappingsError(ex, mappings)
 
 
-def mapper(mappings: typing.List, msg: typing.Dict, filter_ids: typing.Tuple) -> typing.Generator:
+def mapper(mappings: typing.List, msg: typing.Dict) -> typing.Generator:
     for mapping in mappings:
         try:
             src_path = mapping[model.Mapping.src_path].split(".")
             yield mapping[model.Mapping.dst_path], get_value(src_path, msg, len(src_path) - 1)
         except Exception as ex:
-            raise _exceptions.MappingError(ex, mapping, filter_ids)
+            raise _exceptions.MappingError(ex, mapping)
 
 
 def validate_identifier(key: str, value: typing.Optional[typing.Union[str, int, float]] = None):
@@ -253,8 +253,8 @@ class FilterHandler:
                     filter_ids = tuple(self.__filters[i_str][m_hash])
                     try:
                         yield FilterResult(
-                            data=data_builder(mapper(mappings=self.__mappings[m_hash][model.MappingType.data], msg=message, filter_ids=filter_ids)),
-                            extra=extra_builder(mapper(mappings=self.__mappings[m_hash][model.MappingType.extra], msg=message, filter_ids=filter_ids)),
+                            data=data_builder(mapper(mappings=self.__mappings[m_hash][model.MappingType.data], msg=message)),
+                            extra=extra_builder(mapper(mappings=self.__mappings[m_hash][model.MappingType.extra], msg=message)),
                             filter_ids=filter_ids
                         )
                     except Exception as ex:
