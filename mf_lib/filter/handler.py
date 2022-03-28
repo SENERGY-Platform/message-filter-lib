@@ -241,13 +241,15 @@ class FilterHandler:
         except Exception as ex:
             raise _exceptions.MessageIdentificationError(ex)
 
-    def get_results(self, message: typing.Dict, source: typing.Optional[str] = None, data_builder: typing.Optional[typing.Callable[[typing.Generator], typing.Any]] = mf_lib.builders.dict_builder, extra_builder: typing.Optional[typing.Callable[[typing.Generator], typing.Any]] = mf_lib.builders.dict_builder) -> typing.Generator[FilterResult, None, None]:
+    def get_results(self, message: typing.Dict, source: typing.Optional[str] = None, data_builder: typing.Optional[typing.Callable[[typing.Generator], typing.Any]] = mf_lib.builders.dict_builder, extra_builder: typing.Optional[typing.Callable[[typing.Generator], typing.Any]] = mf_lib.builders.dict_builder, data_ignore_missing_keys: bool = False, extra_ignore_missing_keys: bool = False) -> typing.Generator[FilterResult, None, None]:
         """
         Generator that applies filters to a message and yields extracted data.
         :param message: Dictionary containing message data.
         :param source: Message source.
         :param data_builder: Builder function for custom data structures. Default is ew_lib.builders.dict_builder.
         :param extra_builder: Builder function for custom data structures. Default is ew_lib.builders.dict_builder.
+        :param data_ignore_missing_keys: Ignore missing message keys. Default is False.
+        :param extra_ignore_missing_keys: Ignore missing message keys. Default is False.
         :returns: FilterResult objects.
         """
         with self.__lock:
@@ -257,8 +259,8 @@ class FilterHandler:
                     filter_ids = tuple(self.__filters[i_str][m_hash])
                     try:
                         yield FilterResult(
-                            data=data_builder(mapper(mappings=self.__mappings[m_hash][model.MappingType.data], msg=message)),
-                            extra=extra_builder(mapper(mappings=self.__mappings[m_hash][model.MappingType.extra], msg=message)),
+                            data=data_builder(mapper(mappings=self.__mappings[m_hash][model.MappingType.data], msg=message, ignore_missing=data_ignore_missing_keys)),
+                            extra=extra_builder(mapper(mappings=self.__mappings[m_hash][model.MappingType.extra], msg=message, ignore_missing=extra_ignore_missing_keys)),
                             filter_ids=filter_ids
                         )
                     except Exception as ex:
