@@ -54,11 +54,15 @@ def parse_mappings(mappings: typing.Dict) -> typing.Dict:
         raise _exceptions.ParseMappingsError(ex, mappings)
 
 
-def mapper(mappings: typing.List, msg: typing.Dict) -> typing.Generator:
+def mapper(mappings: typing.List, msg: typing.Dict, ignore_missing=False) -> typing.Generator:
     for mapping in mappings:
         try:
             src_path = mapping[model.Mapping.src_path].split(".")
-            yield mapping[model.Mapping.dst_path], get_value(src_path, msg, len(src_path) - 1)
+            try:
+                yield mapping[model.Mapping.dst_path], get_value(src_path, msg, len(src_path) - 1)
+            except KeyError:
+                if not ignore_missing:
+                    raise
         except Exception as ex:
             raise _exceptions.MappingError(ex, mapping)
 
