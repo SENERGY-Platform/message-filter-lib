@@ -29,7 +29,7 @@ import traceback
 class FilterHandlerError(Exception):
     def __init__(self, msg, msg_args=None, ex=None):
         if ex:
-            ex_str = "[" + ",".join([item.strip().replace("\n", " ") for item in traceback.format_exception_only(type(ex), ex)]) + "]"
+            ex_str = "[" + ", ".join([item.strip().replace("\n", " ") for item in traceback.format_exception_only(type(ex), ex)]) + "]"
             msg += f"reason={ex_str}"
         if msg_args:
             msg += msg_args
