@@ -229,12 +229,30 @@
   {
     "action": "add",
     "filter": {
+      "source": "src_1",
+      "identifiers": [
+        {
+          "key": "id_j",
+          "value": "i-j"
+        }
+      ],
+      "mappings": {
+        "val:data": "data.val",
+        "test_1:data": "test",
+        "test_2:data": "data.test"
+      },
+      "id": "filter-11"
+    }
+  },
+  {
+    "action": "add",
+    "filter": {
       "source": "src_2",
       "identifiers": null,
       "mappings": {
         "val:data": "val"
       },
-      "id": "filter-11"
+      "id": "filter-12"
     }
   }
 ]
