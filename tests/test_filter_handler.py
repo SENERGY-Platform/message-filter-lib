@@ -66,6 +66,22 @@ class TestFilterHandler(unittest.TestCase):
             for message in data_good[source]:
                 try:
                     for result in filter_handler.get_results(message=message, source=source):
+                        if not result.ex:
+                            self.assertIn(str(result), get_results_good_filters)
+                        else:
+                            self.assertIsInstance(result.ex, mf_lib.exceptions.MappingError)
+                        count += 1
+                except mf_lib.exceptions.NoFilterError:
+                    pass
+        self.assertEqual(count, len(get_results_good_filters) - 1)
+
+    def test_get_results_ignore_missing_good_filters(self):
+        filter_handler = self._test_filter_ingestion(filters=filters_good)
+        count = 0
+        for source in data_good:
+            for message in data_good[source]:
+                try:
+                    for result in filter_handler.get_results(message=message, source=source, data_ignore_missing_keys=True):
                         self.assertIn(str(result), get_results_good_filters)
                         count += 1
                 except mf_lib.exceptions.NoFilterError:
@@ -82,7 +98,7 @@ class TestFilterHandler(unittest.TestCase):
                 try:
                     for result in filter_handler.get_results(message=message, source=source):
                         if result.ex:
-                            self.assertIsInstance(result.ex, Exception)
+                            self.assertIsInstance(result.ex, mf_lib.exceptions.FilterHandlerError)
                             ex_count -= 1
                         else:
                             self.assertIn(str(result), get_results_bad_filters)
