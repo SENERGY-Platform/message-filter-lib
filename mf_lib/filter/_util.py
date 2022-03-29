@@ -14,9 +14,70 @@
    limitations under the License.
 """
 
+from ._model import *
 import mf_lib.exceptions
 import typing
 import hashlib
+
+
+class HashMappingsError(mf_lib.exceptions.FilterHandlerError):
+    def __init__(self, ex, mappings):
+        super().__init__(msg="hashing mappings failed: ", msg_args=f" mappings={mappings}", ex=ex)
+
+
+class ParseMappingsError(mf_lib.exceptions.FilterHandlerError):
+    def __init__(self, ex, mappings):
+        super().__init__(msg="parsing mappings failed: ", msg_args=f" mappings={mappings}", ex=ex)
+
+
+def hash_mappings(mappings: typing.Dict):
+    try:
+        return hash_dict(mappings)
+    except Exception as ex:
+        raise HashMappingsError(ex, mappings)
+
+
+def parse_mappings(mappings: typing.Dict) -> typing.Dict:
+    try:
+        parsed_mappings = {
+            MappingType.data: list(),
+            MappingType.extra: list()
+        }
+        for key, value in mappings.items():
+            validate(value, str, "source path")
+            dst_path, m_type = key.split(":")
+            validate(dst_path, str, "destination path")
+            validate(m_type, str, "mapping type")
+            assert m_type in MappingType.__dict__.values()
+            parsed_mappings[m_type].append(
+                {
+                    Mapping.src_path: value,
+                    Mapping.dst_path: dst_path
+                }
+            )
+        return parsed_mappings
+    except Exception as ex:
+        raise ParseMappingsError(ex, mappings)
+
+
+def mapper(mappings: typing.List, msg: typing.Dict, ignore_missing=False) -> typing.Generator:
+    for mapping in mappings:
+        try:
+            src_path = mapping[Mapping.src_path].split(".")
+            try:
+                yield mapping[Mapping.dst_path], get_value(src_path, msg, len(src_path) - 1)
+            except KeyError:
+                if not ignore_missing:
+                    raise
+        except Exception as ex:
+            raise mf_lib.exceptions.MappingError(ex, mapping)
+
+
+def validate_identifier(key: str, value: typing.Optional[typing.Union[str, int, float]] = None):
+    validate(key, str, f"identifier {Identifier.key}")
+    if value:
+        validate(value, (str, int, float), f"identifier {Identifier.value}")
+    return key, value
 
 
 def hash_str(obj: str) -> str:
