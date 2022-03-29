@@ -25,6 +25,9 @@ import threading
 
 
 class FilterResult:
+    """
+    Stores extracted data and corresponding filter IDs or an exception.
+    """
     def __init__(self, data=None, extra=None, filter_ids=None, ex=None):
         self.data = data
         self.extra = extra
