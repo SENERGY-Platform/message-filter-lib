@@ -17,18 +17,28 @@
 __all__ = ("FilterHandler", "FilterResult")
 
 from .._util import hash_dict, hash_list, get_value, validate
-from ..exceptions import _exceptions
+from .. import exceptions
 from . import model
 import mf_lib.builders
 import typing
 import threading
 
 
+class _HashMappingsError(exceptions.FilterHandlerError):
+    def __init__(self, ex, mappings):
+        super().__init__(msg="hashing mappings failed: ", msg_args=f" mappings={mappings}", ex=ex)
+
+
+class _ParseMappingsError(exceptions.FilterHandlerError):
+    def __init__(self, ex, mappings):
+        super().__init__(msg="parsing mappings failed: ", msg_args=f" mappings={mappings}", ex=ex)
+
+
 def hash_mappings(mappings: typing.Dict):
     try:
         return hash_dict(mappings)
     except Exception as ex:
-        raise _exceptions.HashMappingsError(ex, mappings)
+        raise _HashMappingsError(ex, mappings)
 
 
 def parse_mappings(mappings: typing.Dict) -> typing.Dict:
@@ -51,7 +61,7 @@ def parse_mappings(mappings: typing.Dict) -> typing.Dict:
             )
         return parsed_mappings
     except Exception as ex:
-        raise _exceptions.ParseMappingsError(ex, mappings)
+        raise _ParseMappingsError(ex, mappings)
 
 
 def mapper(mappings: typing.List, msg: typing.Dict, ignore_missing=False) -> typing.Generator:
@@ -64,7 +74,7 @@ def mapper(mappings: typing.List, msg: typing.Dict, ignore_missing=False) -> typ
                 if not ignore_missing:
                     raise
         except Exception as ex:
-            raise _exceptions.MappingError(ex, mapping)
+            raise exceptions.MappingError(ex, mapping)
 
 
 def validate_identifier(key: str, value: typing.Optional[typing.Union[str, int, float]] = None):
@@ -239,15 +249,15 @@ class FilterHandler:
             if identifier:
                 return "".join([str(msg[key]) for key in identifier[1]]) + identifier[2]
         except Exception as ex:
-            raise _exceptions.MessageIdentificationError(ex)
+            raise exceptions.MessageIdentificationError(ex)
 
     def get_results(self, message: typing.Dict, source: typing.Optional[str] = None, data_builder: typing.Optional[typing.Callable[[typing.Generator], typing.Any]] = mf_lib.builders.dict_builder, extra_builder: typing.Optional[typing.Callable[[typing.Generator], typing.Any]] = mf_lib.builders.dict_builder, data_ignore_missing_keys: bool = False, extra_ignore_missing_keys: bool = False) -> typing.Generator[FilterResult, None, None]:
         """
         Generator that applies filters to a message and yields extracted data.
         :param message: Dictionary containing message data.
         :param source: Message source.
-        :param data_builder: Builder function for custom data structures. Default is ew_lib.builders.dict_builder.
-        :param extra_builder: Builder function for custom data structures. Default is ew_lib.builders.dict_builder.
+        :param data_builder: Builder function for custom data structures. Default is mf_lib.builders.dict_builder.
+        :param extra_builder: Builder function for custom data structures. Default is mf_lib.builders.dict_builder.
         :param data_ignore_missing_keys: Ignore missing message keys. Default is False.
         :param extra_ignore_missing_keys: Ignore missing message keys. Default is False.
         :returns: FilterResult objects.
@@ -266,7 +276,7 @@ class FilterHandler:
                     except Exception as ex:
                         yield FilterResult(filter_ids=filter_ids, ex=ex)
             else:
-                raise _exceptions.NoFilterError()
+                raise exceptions.NoFilterError()
 
     def add_filter(self, filter: typing.Dict):
         """
@@ -277,7 +287,7 @@ class FilterHandler:
         try:
             self.__add(**filter)
         except Exception as ex:
-            raise _exceptions.AddFilterError(ex)
+            raise exceptions.AddFilterError(ex)
 
     def delete_filter(self, id: str):
         """
@@ -301,9 +311,9 @@ class FilterHandler:
                         filter_id=id
                     )
                 else:
-                    raise _exceptions.UnknownFilterIDError(filter_id=id)
+                    raise exceptions.UnknownFilterIDError(filter_id=id)
         except Exception as ex:
-            raise _exceptions.DeleteFilterError(ex)
+            raise exceptions.DeleteFilterError(ex)
 
     def get_filter_args(self, id: str) -> typing.Dict:
         """
@@ -316,7 +326,7 @@ class FilterHandler:
             if id in self.__filter_metadata:
                 return self.__filter_metadata[id][model.FilterMetadata.args]
             else:
-                raise _exceptions.UnknownFilterIDError(filter_id=id)
+                raise exceptions.UnknownFilterIDError(filter_id=id)
 
     def get_sources(self) -> typing.List:
         """

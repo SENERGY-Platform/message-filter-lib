@@ -14,15 +14,6 @@
    limitations under the License.
 """
 
-__all__ = (
-    "FilterHandlerError",
-    "NoFilterError",
-    "MessageIdentificationError",
-    "AddFilterError",
-    "DeleteFilterError",
-    "UnknownFilterIDError"
-)
-
 import traceback
 
 
@@ -49,16 +40,6 @@ class NoFilterError(FilterHandlerError):
 class MappingError(FilterHandlerError):
     def __init__(self, ex, mapping):
         super().__init__(msg="mapping error: ", msg_args=f" mapping={mapping}", ex=ex)
-
-
-class HashMappingsError(FilterHandlerError):
-    def __init__(self, ex, mappings):
-        super().__init__(msg="hashing mappings failed: ", msg_args=f" mappings={mappings}", ex=ex)
-
-
-class ParseMappingsError(FilterHandlerError):
-    def __init__(self, ex, mappings):
-        super().__init__(msg="parsing mappings failed: ", msg_args=f" mappings={mappings}", ex=ex)
 
 
 class AddFilterError(FilterHandlerError):
