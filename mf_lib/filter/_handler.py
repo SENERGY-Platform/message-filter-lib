@@ -95,17 +95,16 @@ class FilterHandler:
     def __add_identifier(self, identifiers: list, filter_id: str):
         i_val_keys = list()
         i_no_val_keys = list()
-        i_values = list()
+        i_values = dict()
         for identifier in identifiers:
             key, value = validate_identifier(**identifier)
             if value:
                 i_val_keys.append(key)
-                i_values.append(value)
+                i_values[key] = value
             else:
                 i_no_val_keys.append(key)
         i_val_keys.sort()
         i_no_val_keys.sort()
-        i_values.sort()
         i_keys = i_val_keys + i_no_val_keys
         i_hash = hash_list(i_keys)
         if i_hash not in self.__identifiers:
@@ -114,7 +113,7 @@ class FilterHandler:
             self.__identifiers_filter_map[i_hash] = {filter_id}
         else:
             self.__identifiers_filter_map[i_hash].add(filter_id)
-        return i_hash, "".join(i_values) + self.__identifiers[i_hash][2]
+        return i_hash, "".join([i_values[k] for k in i_val_keys]) + self.__identifiers[i_hash][2]
 
     def __del_identifier(self, i_hash: str, filter_id: str):
         self.__identifiers_filter_map[i_hash].discard(filter_id)
