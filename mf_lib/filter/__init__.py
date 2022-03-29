@@ -14,4 +14,4 @@
    limitations under the License.
 """
 
-from .handler import *
+from ._handler import *
