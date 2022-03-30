@@ -157,6 +157,8 @@ class FilterHandler:
         if args:
             validate(args, dict, f"filter {Filter.args}")
         with self.__lock:
+            if id in self.__filter_metadata:
+                raise DuplicateFilterIDError(id)
             m_hash = hash_mappings(mappings=mappings)
             if identifiers:
                 i_hash, i_str = self.__add_identifier(identifiers=identifiers, filter_id=id)
