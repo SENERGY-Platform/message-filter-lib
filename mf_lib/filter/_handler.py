@@ -98,6 +98,8 @@ class FilterHandler:
         i_values = dict()
         for identifier in identifiers:
             key, value = validate_identifier(**identifier)
+            if key in i_val_keys or key in i_no_val_keys:
+                raise IdentifierKeyError(key, identifiers)
             if value:
                 i_val_keys.append(key)
                 i_values[key] = value
