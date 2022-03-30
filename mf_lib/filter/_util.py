@@ -30,6 +30,11 @@ class ParseMappingsError(mf_lib.exceptions.FilterHandlerError):
         super().__init__(msg="parsing mappings failed: ", msg_args=f" mappings={mappings}", ex=ex)
 
 
+class IdentifierKeyError(mf_lib.exceptions.FilterHandlerError):
+    def __init__(self, key, identifiers):
+        super().__init__(msg=f"invalid key configuration: ", msg_args=f" key='{key}' identifiers={identifiers}")
+
+
 def hash_mappings(mappings: typing.Dict):
     try:
         return hash_dict(mappings)
