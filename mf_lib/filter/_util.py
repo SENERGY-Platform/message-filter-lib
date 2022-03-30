@@ -32,7 +32,7 @@ class ParseMappingsError(mf_lib.exceptions.FilterHandlerError):
 
 class IdentifierKeyError(mf_lib.exceptions.FilterHandlerError):
     def __init__(self, key, identifiers):
-        super().__init__(msg=f"invalid key configuration: ", msg_args=f" key='{key}' identifiers={identifiers}")
+        super().__init__(msg=f"invalid key configuration: key='{key}' identifiers={identifiers}")
 
 
 def hash_mappings(mappings: typing.Dict):
