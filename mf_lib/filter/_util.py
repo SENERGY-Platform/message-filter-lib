@@ -35,6 +35,11 @@ class IdentifierKeyError(mf_lib.exceptions.FilterHandlerError):
         super().__init__(msg=f"invalid key configuration: key='{key}' identifiers={identifiers}")
 
 
+class DuplicateFilterIDError(mf_lib.exceptions.FilterHandlerError):
+    def __init__(self, id):
+        super().__init__(msg=f"filter ID already exists: id={id}")
+
+
 def hash_mappings(mappings: typing.Dict):
     try:
         return hash_dict(mappings)
