@@ -40,6 +40,11 @@ class DuplicateFilterIDError(mf_lib.exceptions.FilterHandlerError):
         super().__init__(msg=f"filter ID already exists: id={id}")
 
 
+def validate(obj, cls, name):
+    assert obj, f"'{name}' can't be None"
+    assert isinstance(obj, cls), f"'{name}' can't be of type '{type(obj).__name__}'"
+
+
 def hash_mappings(mappings: typing.Dict):
     try:
         return hash_dict(mappings)
@@ -68,6 +73,12 @@ def parse_mappings(mappings: typing.Dict) -> typing.Dict:
         return parsed_mappings
     except Exception as ex:
         raise ParseMappingsError(ex, mappings)
+
+
+def get_value(path: typing.List, obj: typing.Dict, size: int, pos: typing.Optional[int] = 0) -> typing.Any:
+    if pos < size:
+        return get_value(path, obj[path[pos]], size, pos + 1)
+    return obj[path[pos]]
 
 
 def mapper(mappings: typing.List, msg: typing.Dict, ignore_missing=False) -> typing.Generator:
@@ -102,14 +113,3 @@ def hash_dict(obj: typing.Dict) -> str:
     items = ["{}{}".format(key, value) for key, value in obj.items()]
     items.sort()
     return hash_list(items)
-
-
-def get_value(path: typing.List, obj: typing.Dict, size: int, pos: typing.Optional[int] = 0) -> typing.Any:
-    if pos < size:
-        return get_value(path, obj[path[pos]], size, pos + 1)
-    return obj[path[pos]]
-
-
-def validate(obj, cls, name):
-    assert obj, f"'{name}' can't be None"
-    assert isinstance(obj, cls), f"'{name}' can't be of type '{type(obj).__name__}'"
