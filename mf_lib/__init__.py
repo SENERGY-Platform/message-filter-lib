@@ -14,7 +14,7 @@
    limitations under the License.
 """
 
-__version__ = '0.7.2'
+__version__ = '0.8.0'
 __title__ = 'message-filter-lib'
 __description__ = 'Library for filtering and extracting data from messages.'
 __url__ = 'https://github.com/SENERGY-Platform/message-filter-lib'
