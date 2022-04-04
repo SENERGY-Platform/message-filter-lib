@@ -268,16 +268,14 @@ class FilterHandler:
         :return: Dictionary containing args of a filter.
         """
         validate(id, str, "id")
-        with self.__lock:
-            if id in self.__filter_metadata:
-                return self.__filter_metadata[id][FilterMetadata.args]
-            else:
-                raise mf_lib.exceptions.UnknownFilterIDError(filter_id=id)
+        if id in self.__filter_metadata:
+            return self.__filter_metadata[id][FilterMetadata.args]
+        else:
+            raise mf_lib.exceptions.UnknownFilterIDError(filter_id=id)
 
     def get_sources(self) -> typing.List:
         """
         Get all sources added by filters.
         :return: List containing sources.
         """
-        with self.__lock:
-            return list(self.__sources)
+        return list(self.__sources)
