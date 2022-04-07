@@ -40,13 +40,6 @@ with open("tests/resources/get_results_bad_filters.json") as file:
     get_results_bad_filters: list = json.load(file)
 
 
-def test_builder(mapper, prefix):
-    data = dict()
-    for key, value in mapper:
-        data[f"{prefix}_{key}"] = value
-    return data
-
-
 class TestFilterHandler(unittest.TestCase):
     def _test_filter_ingestion(self, filters):
         filter_handler = mf_lib.FilterHandler()
