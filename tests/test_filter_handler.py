@@ -40,6 +40,13 @@ with open("tests/resources/get_results_bad_filters.json") as file:
     get_results_bad_filters: list = json.load(file)
 
 
+def test_builder(mapper, prefix):
+    data = dict()
+    for key, value in mapper:
+        data[f"{prefix}_{key}"] = value
+    return data
+
+
 class TestFilterHandler(unittest.TestCase):
     def _test_filter_ingestion(self, filters):
         filter_handler = mf_lib.FilterHandler()
@@ -59,66 +66,53 @@ class TestFilterHandler(unittest.TestCase):
             self.assertIn(source, sources)
         return filter_handler
 
-    def test_get_results_good_filters(self):
-        filter_handler = self._test_filter_ingestion(filters=filters_good)
-        count = 0
-        for source in data_good:
-            for message in data_good[source]:
+    def _test_get_results(self, filters, data, data_builder=mf_lib.builders.dict_builder, extra_builder=mf_lib.builders.dict_builder, data_ignore_missing_keys=False, extra_ignore_missing_keys=False):
+        filter_handler = self._test_filter_ingestion(filters=filters)
+        for source in data:
+            for message in data[source]:
                 try:
-                    for result in filter_handler.get_results(message=message, source=source):
-                        if not result.ex:
-                            self.assertIn(str(result), get_results_good_filters)
-                        else:
-                            self.assertIsInstance(result.ex, mf_lib.exceptions.MappingError)
-                        count += 1
-                except mf_lib.exceptions.NoFilterError:
+                    for result in filter_handler.get_results(message=message, source=source, data_builder=data_builder, extra_builder=extra_builder, data_ignore_missing_keys=data_ignore_missing_keys, extra_ignore_missing_keys=extra_ignore_missing_keys):
+                        yield result
+                except (mf_lib.exceptions.NoFilterError, mf_lib.exceptions.MessageIdentificationError):
                     pass
-        self.assertEqual(count, len(get_results_good_filters) - 1)
 
-    def test_get_results_ignore_missing_good_filters(self):
-        filter_handler = self._test_filter_ingestion(filters=filters_good)
+    def test_get_results(self):
         count = 0
-        for source in data_good:
-            for message in data_good[source]:
-                try:
-                    for result in filter_handler.get_results(message=message, source=source, data_ignore_missing_keys=True):
-                        self.assertIn(str(result), get_results_good_filters)
-                        count += 1
-                except mf_lib.exceptions.NoFilterError:
-                    pass
-        self.assertEqual(count, len(get_results_good_filters) - 1)
+        for result in self._test_get_results(filters=filters_good, data=data_good):
+            if result.ex:
+                self.assertIsInstance(result.ex, mf_lib.exceptions.MappingError)
+            self.assertIn(str(result), get_results_good_filters[count])
+            count += 1
+
+    def test_get_results_data_ignore_missing_keys(self):
+        count = 0
+        for result in self._test_get_results(filters=filters_good, data=data_good, data_ignore_missing_keys=True):
+            self.assertIn(str(result), get_results_good_filters[count])
+            count += 1
+
+    def test_get_results_tuple_list_builder(self):
+        count = 0
+        for result in self._test_get_results(filters=filters_good, data=data_good, data_builder=mf_lib.builders.tuple_list_builder, extra_builder=mf_lib.builders.tuple_list_builder, data_ignore_missing_keys=True):
+            self.assertIn(str(result), get_results_good_filters[count])
+            count += 1
+
+    def test_get_results_string_list_builder(self):
+        count = 0
+        for result in self._test_get_results(filters=filters_good, data=data_good, data_builder=mf_lib.builders.string_list_builder, extra_builder=mf_lib.builders.string_list_builder, data_ignore_missing_keys=True):
+            self.assertIn(str(result), get_results_good_filters[count])
+            count += 1
 
     def test_get_results_bad_filters(self):
-        filter_handler = self._test_filter_ingestion(filters=filters_bad)
-        ex_count = 0
-        r_count = 0
-        for source in data_good:
-            for message in data_good[source]:
-                ex_count += 1
-                try:
-                    for result in filter_handler.get_results(message=message, source=source):
-                        if result.ex:
-                            self.assertIsInstance(result.ex, mf_lib.exceptions.FilterHandlerError)
-                            ex_count -= 1
-                        else:
-                            self.assertIn(str(result), get_results_bad_filters)
-                            r_count += 1
-                except mf_lib.exceptions.NoFilterError:
-                    ex_count -= 1
-        self.assertEqual(ex_count, 0)
-        self.assertEqual(r_count, len(get_results_bad_filters))
+        count = 0
+        for result in self._test_get_results(filters=filters_bad, data=data_good):
+            if result.ex:
+                self.assertIsInstance(result.ex, mf_lib.exceptions.FilterHandlerError)
+            self.assertIn(str(result), get_results_bad_filters[count])
+            count += 1
 
     def test_get_results_bad_messages(self):
-        filter_handler = self._test_filter_ingestion(filters=filters_good)
-        count = 0
-        for source in data_bad:
-            for message in data_bad[source]:
-                try:
-                    for _ in filter_handler.get_results(message=message, source=source):
-                        count += 1
-                except mf_lib.exceptions.MessageIdentificationError:
-                    pass
-        self.assertEqual(count, 0)
+        for result in self._test_get_results(filters=filters_good, data=data_bad):
+            self.assertIsNone(result)
 
     def test_get_filter_args(self):
         filter_handler = self._test_filter_ingestion(filters=filters_good)

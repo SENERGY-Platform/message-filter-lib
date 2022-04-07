@@ -1,6 +1,26 @@
 [
-  "{'data': {'val': 1}, 'extra': {}, 'filter_ids': ('filter-19',), 'ex': None}",
-  "{'data': {'val': 2}, 'extra': {}, 'filter_ids': ('filter-19',), 'ex': None}",
-  "{'data': {'val': 3}, 'extra': {}, 'filter_ids': ('filter-19',), 'ex': None}",
-  "{'data': {'val': 4}, 'extra': {}, 'filter_ids': ('filter-19',), 'ex': None}"
+  [
+    "{'data': None, 'extra': None, 'filter_ids': ('filter-18',), 'ex': MappingError(\"mapping error: reason=[KeyError: 'test'] mapping={'src_path': 'test', 'dst_path': 'val'}\")}"
+  ],
+  [
+    "{'data': {'val': 1}, 'extra': {}, 'filter_ids': ('filter-19',), 'ex': None}"
+  ],
+  [
+    "{'data': None, 'extra': None, 'filter_ids': ('filter-18',), 'ex': MappingError(\"mapping error: reason=[KeyError: 'test'] mapping={'src_path': 'test', 'dst_path': 'val'}\")}"
+  ],
+  [
+    "{'data': {'val': 2}, 'extra': {}, 'filter_ids': ('filter-19',), 'ex': None}"
+  ],
+  [
+    "{'data': None, 'extra': None, 'filter_ids': ('filter-18',), 'ex': MappingError(\"mapping error: reason=[KeyError: 'test'] mapping={'src_path': 'test', 'dst_path': 'val'}\")}"
+  ],
+  [
+    "{'data': {'val': 3}, 'extra': {}, 'filter_ids': ('filter-19',), 'ex': None}"
+  ],
+  [
+    "{'data': None, 'extra': None, 'filter_ids': ('filter-18',), 'ex': MappingError(\"mapping error: reason=[KeyError: 'test'] mapping={'src_path': 'test', 'dst_path': 'val'}\")}"
+  ],
+  [
+    "{'data': {'val': 4}, 'extra': {}, 'filter_ids': ('filter-19',), 'ex': None}"
+  ]
 ]
